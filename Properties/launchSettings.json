@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "TextoPageBuilder": {
+      "commandName": "Project",
+      "commandLineArgs": "C:\\Users\\broke\\Program\\ProjectTextoPage\\OriginSite\\config.xml"
+    }
+  }
+}
