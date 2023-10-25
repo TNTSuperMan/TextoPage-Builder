@@ -67,9 +67,15 @@ internal class Program
         Directory.Delete(sc.od, true);
         Directory.CreateDirectory(sc.od);
         Copy(sc.sd + "\\.advance\\index.html", sc.od + "\\indexhtml");
-        Copy(sc.sd + "\\config\\temp.json", sc.od + "\\temp.json");
+        mkdir(sc.od + "\\config\\");
+        Copy(sc.sd + "\\config\\temp.json", sc.od + "\\config\\temp.json");
         log("------------完了------------");
         #endregion
+    }
+    private static void mkdir(string path)
+    {
+        log("ディレクトリ \"" + path + "\" を追加");
+        Directory.CreateDirectory(path);
     }
     private static void Copy(string src, string dest)
     {
