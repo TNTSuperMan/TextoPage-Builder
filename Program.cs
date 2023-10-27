@@ -1,7 +1,7 @@
 ﻿using System.Net.NetworkInformation;
 using System.Xml.Serialization;
 
-internal class Program
+internal partial class Program
 {
     private static void Main(string[] args)
     {
@@ -25,7 +25,7 @@ internal class Program
         #endregion
 
         #region LoadConfig
-        log("---設定ファイルの読み込み---");
+        log("-----設定ファイルの読み込み-----");
         var ser = new XmlSerializer(typeof(SiteConfig));
         SiteConfig sc = new SiteConfig();
         try
@@ -42,11 +42,11 @@ internal class Program
             Console.WriteLine("設定ファイルが認識できませんでした。");
             return;
         }
-        log("------------完了------------");
+        log("--------------完了--------------");
         #endregion
 
         #region VerifyFile
-        log("---ファイル等の存在の確認---");
+        log("-----ファイル等の存在の確認-----");
         if (VerifyDir(sc.sd + "\\.advance")) return;
         if (VerifyDir(sc.sd + "\\config")) return;
         if (VerifyDir(sc.sd + "\\page")) return;
@@ -58,51 +58,15 @@ internal class Program
         if (VerifyFile(sc.sd + "\\page\\header.page")) return;
         if (!sc.tisurl) if (VerifyFile(sc.textopage)) return;
         if (!sc.lisurl) if (VerifyFile(sc.launcher)) return;
-        log("------------完了------------");
+        log("--------------完了--------------");
         #endregion
-        #region CopyFile
-        log("-----ファイル等のコピー-----");
 
-        log("Retを空にする");
-        Directory.Delete(sc.od, true);
-        Directory.CreateDirectory(sc.od);
-        Copy(sc.sd + "\\.advance\\index.html", sc.od + "\\indexhtml");
-        mkdir(sc.od + "\\config\\");
-        Copy(sc.sd + "\\config\\temp.json", sc.od + "\\config\\temp.json");
-        log("------------完了------------");
+        #region CopyFiles
+        log("--------ファイルのコピー--------");
+        cpdir(sc.sd + "\\page", sc.od + "\\page");
+        log("--------------完了--------------");
         #endregion
     }
-    private static void mkdir(string path)
-    {
-        log("ディレクトリ \"" + path + "\" を追加");
-        Directory.CreateDirectory(path);
-    }
-    private static void Copy(string src, string dest)
-    {
-        log("\n\"" + src + "\" から\n\"" + dest + "\" へコピー");
-        File.Copy(src, dest);
-    }
-    private static bool VerifyFile(string filename)
-    {
-        log("確認：ファイル \"" + filename + "\"");
-        if (!File.Exists(filename)) 
-        { 
-            log("ファイル \"" + filename + "\" が存在しません。");
-            return true;
-        }
-        return false;
-    }
-    private static bool VerifyDir(string filename)
-    {
-        log("確認：ディレクトリ \"" + filename + "\"");
-        if (!Directory.Exists(filename))
-        {
-            log("ディレクトリ \"" + filename + "\" が存在しません。");
-            return true;
-        }
-        return false;
-    }
-    private static void log(string message) => Console.WriteLine(message);
 }
 public class SiteConfig
 {
