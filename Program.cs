@@ -50,7 +50,6 @@ internal partial class Program
         if (VerifyDir(sc.sd + "\\config")) return;
         if (VerifyDir(sc.sd + "\\page")) return;
         if (VerifyDir(sc.sd + "\\resources")) return;
-        if (VerifyDir(sc.od)) mkdir(sc.od);
         if (VerifyFile(sc.sd + "\\config\\temp.json")) return;
         if (VerifyFile(sc.sd + "\\.advance\\index.html")) return;
         if (VerifyFile(sc.sd + "\\page\\footer.page")) return;
@@ -62,6 +61,7 @@ internal partial class Program
 
         #region CopyFiles
         log("--------ファイルのコピー--------");
+        mkdir(sc.od);
         mkdir(sc.od + "\\script");
         mkdir(sc.od + "\\config");
         cpdir(sc.sd + "\\page", sc.od + "\\page");
@@ -70,6 +70,12 @@ internal partial class Program
         cp(sc.launcher, sc.od + "\\script\\launcher.js");
         cp(sc.sd + "\\.advance\\index.html", sc.od + "\\index.html");
         cp(sc.sd + "\\config\\temp.json", sc.od + "\\config\\temp.json");
+        log("--------------完了--------------");
+        #endregion
+
+        #region LoadPlugin
+        log("------プラグインの読み込み------");
+
         log("--------------完了--------------");
         #endregion
     }
