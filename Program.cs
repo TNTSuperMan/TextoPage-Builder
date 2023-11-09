@@ -1,4 +1,11 @@
-﻿using System.Xml.Serialization;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Text.Unicode;
+using System.Xml;
+using System.Xml.Serialization;
 
 internal partial class Program
 {
@@ -46,10 +53,10 @@ internal partial class Program
 
         #region VerifyFile
         log("-----ファイル等の存在の確認-----");
+        if (VerifyDir(sc.sd)) return;
         if (VerifyDir(sc.sd + "\\.advance")) return;
         if (VerifyDir(sc.sd + "\\config")) return;
         if (VerifyDir(sc.sd + "\\page")) return;
-        if (VerifyDir(sc.sd + "\\resources")) return;
         if (VerifyFile(sc.sd + "\\config\\temp.json")) return;
         if (VerifyFile(sc.sd + "\\.advance\\index.html")) return;
         if (VerifyFile(sc.sd + "\\page\\footer.page")) return;
@@ -65,7 +72,8 @@ internal partial class Program
         mkdir(sc.od + "\\script");
         mkdir(sc.od + "\\config");
         cpdir(sc.sd + "\\page", sc.od + "\\page");
-        cpdir(sc.sd + "\\resources", sc.od + "\\resources");
+        if(Directory.Exists(sc.sd + "\\resources")) cpdir(sc.sd + "\\resources", sc.od + "\\resources");
+        if (Directory.Exists(sc.sd + "\\sources")) cpdir(sc.sd + "\\sources", sc.od + "\\sources");
         cp(sc.textopage,sc.od + "\\script\\textopage.js");
         cp(sc.launcher, sc.od + "\\script\\launcher.js");
         cp(sc.sd + "\\.advance\\index.html", sc.od + "\\index.html");
@@ -75,18 +83,37 @@ internal partial class Program
 
         #region LoadPlugin
         log("------プラグインの読み込み------");
+        var plugconf = new Dictionary<string, string[]>();
+        var script = new List<string>();
+        var module = new List<string>();
+        var style = new List<string>();
+        script.Add("/script/textopage.js");
+        script.Add("https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js");
+        style.Add("https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/themes/smoothness/jquery-ui.css");
+        if (Directory.Exists(sc.sd + "\\sources"))
+        {
+            if (Directory.Exists(sc.sd + "\\sources\\script")) foreach (string s in Directory.GetFiles(sc.sd + "\\sources\\script")) script.Add("/sources/script/" + Path.GetFileName(s));
+            if (Directory.Exists(sc.sd + "\\sources\\module")) foreach (string s in Directory.GetFiles(sc.sd + "\\sources\\module")) module.Add("/sources/module/" + Path.GetFileName(s));
+            if (Directory.Exists(sc.sd + "\\sources\\style")) foreach (string s in Directory.GetFiles(sc.sd + "\\sources\\style")) style.Add("/sources/style/" + Path.GetFileName(s));
+        }
 
+
+        plugconf.Add("script",script.ToArray());
+        plugconf.Add("module", module.ToArray());
+        plugconf.Add("css", style.ToArray());
+        string plugjson = JsonSerializer.Serialize(plugconf,new JsonSerializerOptions { Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),WriteIndented = true});
+        File.WriteAllText(sc.od + "\\config\\plugin.json",plugjson);
         log("--------------完了--------------");
         #endregion
     }
 }
 public class SiteConfig
 {
-    public string textopage;
+    public string? textopage;
 
-    public string launcher;
+    public string? launcher;
 
-    public string sd; //No last slash
+    public string? sd;
 
-    public string od;
+    public string? od;
 }
